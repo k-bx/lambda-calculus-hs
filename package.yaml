@@ -1,0 +1,21 @@
+name:                lambda-calculus-hs
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/githubuser/lambda-calculus-hs#readme
+license:             BSD3
+author:              Kostiantyn Rybnikov
+maintainer:          k-bx@k-bx.com
+copyright:           2019 Kostiantyn Rybnikov
+category:            Lambda Calculus
+extra-source-files:
+- README.md
+
+dependencies:
+  - base >= 4.7 && < 5
+
+executables:
+  lambda-calculus-hs:
+    ghc-options: -Wall -Werror
+    source-dirs:      src
+    main:             Main.hs
