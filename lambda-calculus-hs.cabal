@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 02928500c6c0650a665368f139b163d5c8a6100325bde33fe916d45715f8a3d6
+-- hash: f4dd9ac0d432dd75538acab5c88d3d84922803139a2ecbe9ccb95a0d9e3d4cf3
 
 name:           lambda-calculus-hs
 version:        0.1.0.0
-category:       Web
+category:       Lambda Calculus
 homepage:       https://github.com/githubuser/lambda-calculus-hs#readme
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2019 Author name here
+author:         Kostiantyn Rybnikov
+maintainer:     k-bx@k-bx.com
+copyright:      2019 Kostiantyn Rybnikov
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -22,6 +22,19 @@ extra-source-files:
 executable lambda-calculus-hs
   main-is: Main.hs
   other-modules:
+      MainNoRename
+      Paths_lambda_calculus_hs
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Werror
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable lambda-calculus-no-rename
+  main-is: MainNoRename.hs
+  other-modules:
+      Main
       Paths_lambda_calculus_hs
   hs-source-dirs:
       src

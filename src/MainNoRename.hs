@@ -2,7 +2,6 @@
 
 module Main where
 
-import Data.List
 import Data.String
 
 data Expr
@@ -40,43 +39,13 @@ freeVars (Var x) = [x]
 freeVars (Abs x e) = filter (/= x) (freeVars e)
 freeVars (App e1 e2) = freeVars e1 ++ freeVars e2
 
-renameAll :: String -> String -> Expr -> Expr
-renameAll from to (Var y) =
-  if y == from
-    then Var to
-    else Var y
-renameAll from to (Abs y ex) =
-  if y == from
-    then Abs to (renameAll from to ex)
-    else Abs y ex
-renameAll from to (App e1 e2) =
-  App (renameAll from to e1) (renameAll from to e2)
-
-alphaRename :: String -> String -> Expr -> Expr
-alphaRename _from _to (Var x) = Var x
-alphaRename from to (Abs x e) =
-  if x == from
-    then Abs to (renameAll from to e)
-    else Abs x (alphaRename from to e)
-alphaRename from to (App e1 e2) =
-  App (alphaRename from to e1) (alphaRename from to e2)
-
 betaReduce :: Expr -> Maybe Expr
 betaReduce (Var _x) = Nothing
 betaReduce (Abs x e) =
   case betaReduce e of
     Nothing -> Nothing
     Just e1 -> Just (Abs x e1)
-betaReduce (App (Abs x e1) e2) =
-  let e1_2 =
-        foldl' (\e v -> alphaRename v (v ++ "′") e) (Abs x e1) (freeVars e2)
-      x_2 =
-        if x `elem` freeVars e2
-          then x ++ "′"
-          else x
-   in case e1_2 of
-        (Abs _x_3 e1_3) -> Just (replaceAll x_2 e2 e1_3)
-        _ -> error "Impossible!"
+betaReduce (App (Abs x e1) e2) = Just (replaceAll x e2 e1)
   where
     replaceAll from to (Var y) =
       if y == from
@@ -119,41 +88,24 @@ showEvalToNf fuel ex = do
       case betaReduce e of
         Nothing -> putStrLn " → ■"
         Just e2 -> do
-          putStr ("\n → " ++ show e2)
+          putStr (" → " ++ show e2)
           go (n - 1) e2
-
-combS :: Expr
-combS = λ "n" (λ "a" (λ "b" ("a" · (("n" · "a") · "b"))))
-
-instance Num Expr where
-  fromInteger 0 =
-    λ "s" (λ "z" "z")
-  fromInteger n =
-    λ "s" (λ "z" (go n))
-    where
-      go 0 = "z"
-      go m = "s" · (go (m - 1))
-  a + b = a · combS · b
-  _a * _b = undefined
-  abs = undefined
-  signum = undefined
-  negate = undefined
 
 main :: IO ()
 main = do
+  showBetaReduction ((λ "x" ("x" · "x")) · (λ "y" ("y" · "y")))
+  showBetaReduction "a"
+  showBetaReduction $ (λ "x" "x") · "a"
+  showBetaReduction $ (λ "x" "x") · (λ "x" "x")
+  showBetaReduction $ (λ "x" ("x" · "x")) · (λ "x" ("x" · "x"))
+  showBetaReduction $ (λ "x" (λ "y" ("x" · "y"))) · (λ "z" ((λ "c" "y") · "z"))
+  showBetaReduction $ (λ "x" (λ "y" ("x" · "y"))) · (λ "z" ((λ "c" "y") · "z"))
+  showEvalToNf 5 ((λ "x" ("x" · "x")) · (λ "x" ("x" · "x")))
+  putStrLn $ "This is wrong:"
   showEvalToNf 10 $ (λ "x" (λ "y" ("x" · "y"))) · (λ "z" ((λ "c" "y") · "z"))
-  putStrLn $ "3 is represented as: "
-  print (3 :: Expr)
-  putStrLn $ "S0 ="
-  print (nf (combS · 0))
-  putStrLn $ "1 ="
-  print (nf 1)
-  showEvalToNf 10 $ (combS · 0)
-  putStrLn $ "1 + 1 ="
-  print (nf (1 + 1))
-  putStrLn $ "2 ="
-  print (nf 2)
-  putStrLn $ "2 + 2 ="
-  print (nf (2 + 2))
-  putStrLn $ "4 ="
-  print (nf 4)
+  let e1 = λ "z" ((λ "c" "y") · "z")
+  putStrLn $ "Free vars of " ++ show e1 ++ ":"
+  print $ freeVars $ e1
+  let e2 = λ "x" (λ "y" ("x" · "y"))
+  putStrLn $ "Bound vars of " ++ show e2 ++ ":"
+  print $ boundVars $ e2

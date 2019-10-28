@@ -19,3 +19,7 @@ executables:
     ghc-options: -Wall -Werror
     source-dirs:      src
     main:             Main.hs
+  lambda-calculus-no-rename:
+    ghc-options: -Wall -Werror
+    source-dirs:      src
+    main:             MainNoRename.hs
