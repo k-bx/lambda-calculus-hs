@@ -1,6 +1,7 @@
 {-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module MainNoRename where
 
 import Data.String
 
